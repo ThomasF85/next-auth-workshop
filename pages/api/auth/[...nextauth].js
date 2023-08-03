@@ -40,8 +40,37 @@ if (process.env.VERCEL_ENV === "preview") {
   );
 }
 
+async function getUserRoleFromDatabaseByEmail(email) {
+  if (email === "thomas.foeldi@gmail.com") {
+    return "owner";
+  }
+  return "viewer";
+}
+
+async function getUserRoleFromDatabaseById(id) {
+  if (id === "1") {
+    return "owner";
+  }
+  return "viewer";
+}
+
 export const authOptions = {
   providers,
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        // Will only get user object on initial JWT creation => will only run into this if statement once when signing in
+        token.userId = user.id;
+        token.role = await getUserRoleFromDatabaseById(user.id);
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      session.user.id = token.userId;
+      session.user.role = token.role;
+      return session;
+    },
+  },
 };
 
 export default NextAuth(authOptions);

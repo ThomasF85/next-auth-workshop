@@ -13,6 +13,7 @@ async function handler(req, res) {
         if (!session) {
           return res.status(401).json({ msg: "please log in" });
         }
+        console.log(session.user);
         const fish = fishData.find((fish) => fish.id === id);
         if (!fish) {
           return res.status(404).json({ message: "fish not found" });
